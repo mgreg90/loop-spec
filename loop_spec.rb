@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'bundler/inline'
+gemfile do
+  source 'https://rubygems.org'
+  gem 'playwright-cli', require: 'playwright/cli'
+end
+
+require_relative 'lib/version'
+
+module LoopSpec
+  module CLI
+    module Commands
+      extend Playwright::CLI::Registry
+
+      class Greet < Playwright::CLI::Command
+        desc "Says a greeting to the name given. This is an example."
+
+        argument :name, required: true, desc: 'Whom shall I greet?'
+
+        example [
+          "\"Johnny Boy\" #=> Why, hello Johnny Boy!"
+        ]
+
+        def call(name:, **)
+          display.print "Why, hello #{name}!"
+        end
+
+      end
+
+      register 'greet', Greet
+      register 'version', Version, aliases: ['v', '-v', '--version']
+
+    end
+  end
+end
+
+Playwright::CLI.new(LoopSpec::CLI::Commands).call
